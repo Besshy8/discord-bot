@@ -26,6 +26,16 @@ client.on('message', message => {
             message.channel.send('YOLO!!!!');
         }
         message.channel.send(`Command Name : ${command}\nArguments : ${args}`);
+    } else if (command === 'mention') {
+        // if don't have mentioned member, program is crash
+        if (!message.mentions.users.size) {
+            return message.reply('There are no mention Try again!');
+        }
+        // create Map of mentioned user
+        const mentioned = message.mentions.users.first();
+        const name = mentioned.username;
+        const user_id = mentioned.id;
+        message.channel.send(`Username : ${name}\nid: ${user_id}`);
     }
 });
 

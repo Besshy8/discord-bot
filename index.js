@@ -1,6 +1,16 @@
+const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token } = require('./config.json');
+
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
+const commmandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commmandFiles) {
+    const command = require(`./commands/${file}`);
+
+    client.commands.set(command.name, command);
+}
 
 client.once('ready', () => {
 	console.log('Ready!');
@@ -26,16 +36,8 @@ client.on('message', message => {
             message.channel.send('YOLO!!!!');
         }
         message.channel.send(`Command Name : ${command}\nArguments : ${args}`);
-    } else if (command === 'mention') {
-        // if don't have mentioned member, program is crash
-        if (!message.mentions.users.size) {
-            return message.reply('There are no mention Try again!');
-        }
-        // create Map of mentioned user
-        const mentioned = message.mentions.users.first();
-        const name = mentioned.username;
-        const user_id = mentioned.id;
-        message.channel.send(`Username : ${name}\nid: ${user_id}`);
+    } else if (command == 'mention') {
+        client.commands.get('mention').execute(message, args);
     } else if (command === 'avatar') {
         if (!message.mentions.users.size) {
             return message.channel.send(`Your avatar: <${message.author.displayAvatarURL()}>`);

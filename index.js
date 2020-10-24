@@ -1,6 +1,16 @@
+const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token } = require('./config.json');
+
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
+const commmandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commmandFiles) {
+    const command = require(`./commands/${file}`);
+
+    client.commands.set(command.name, command);
+}
 
 client.once('ready', () => {
 	console.log('Ready!');
@@ -19,48 +29,14 @@ client.on('message', message => {
         message.channel.send(`The server name is : ${message.guild.name}\nTotal members: ${message.guild.memberCount}`);
     } else if (message.content === 'user_info') {
         message.channel.send(`Your username is : ${message.author.username}\nYour ID is :${message.author.id}`);
-    } else if (command === 'afterglow') {
-        if (!args.length) {
-            message.channel.send('No arumentation');
-        } else if (args[0] === 'Hey!') {
-            message.channel.send('YOLO!!!!');
-        }
-        message.channel.send(`Command Name : ${command}\nArguments : ${args}`);
-    } else if (command === 'mention') {
-        // if don't have mentioned member, program is crash
-        if (!message.mentions.users.size) {
-            return message.reply('There are no mention Try again!');
-        }
-        // create Map of mentioned user
-        const mentioned = message.mentions.users.first();
-        const name = mentioned.username;
-        const user_id = mentioned.id;
-        message.channel.send(`Username : ${name}\nid: ${user_id}`);
-    } else if (command === 'avatar') {
-        if (!message.mentions.users.size) {
-            return message.channel.send(`Your avatar: <${message.author.displayAvatarURL()}>`);
-        }
-        // const mentioned = message.mentions.users.first();
-        // message.channel.send(`${mentioned.username}'s avatar URL is ${mentioned.displayAvatarURL({ format: 'png', dynamic: false })}`);
-        // console.log(mentioned);
-        const avatarList = message.mentions.users.map(user => {
-            return `${user.username}'s avatar: <${user.displayAvatarURL({ format: 'png', dynamic: true })}>\nUsers discriminator is ${user.discriminator}`;
-        });
-        message.channel.send(avatarList);
+    }
+    if (!client.commands.has(command)) return;
 
-    } else if (command === 'prune') {
-        const amount = parseInt(args[0]);
-        // BOTのパーミッション周りでエラーがはかれたので調査
-        if (isNaN(amount)) {
-            return message.reply('that doesn\'t seem to be a valid number.');
-        } else if (amount < 2 || amount > 100) {
-            return message.reply('Invalid Number (Needed 2 to 100)');
-        }
-        // TO DO not console log -> message.channel.send
-        message.channel.bulkDelete(amount, true).catch(err => {
-            console.error(err);
-            message.channel.send('There was an error trying to prune message');
-        });
+    try {
+        client.commands.get(command).execute(message, args);
+    } catch (error) {
+        console.error(error);
+        message.reply('there was an error trying to execute that command');
     }
 });
 

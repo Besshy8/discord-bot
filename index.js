@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
+const ytdl = require('ytdl-core');
 const { prefix, token } = require('./config.json');
 
 const client = new Discord.Client();
@@ -16,7 +17,7 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-client.on('message', message => {
+client.on('message', async message => {
     if (message.author.bot) return;
     // console.log(message.content);
     const args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -29,6 +30,13 @@ client.on('message', message => {
         message.channel.send(`The server name is : ${message.guild.name}\nTotal members: ${message.guild.memberCount}`);
     } else if (message.content === 'user_info') {
         message.channel.send(`Your username is : ${message.author.username}\nYour ID is :${message.author.id}`);
+    }else if (message.content === 'join') {
+        if (message.member.voice.channel) {
+            const connection = await message.member.voice.channel.join();
+            connection.play(ytdl('https://www.youtube.com/watch?v=ZlAU_w7-Xp8'));
+        } else {
+            message.reply('You need to join a voice channel first!');
+        }
     }
     if (!client.commands.has(command)) return;
 
@@ -38,6 +46,13 @@ client.on('message', message => {
         console.error(error);
         message.reply('there was an error trying to execute that command');
     }
+
+    // if (!message.guild) return;
+
 });
 
 client.login(token);
+
+async function play(connection, url) {
+    connection.play(await ytdl(url), { type: 'opus' });
+}

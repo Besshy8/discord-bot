@@ -1,6 +1,8 @@
 module.exports = {
     name: 'mention',
     description: 'Mention!',
+    args: true,
+    usage: '<username>',
     execute(message, args) {
         if (!message.mentions.users.size) {
             return message.reply('There are no mention Try again!');

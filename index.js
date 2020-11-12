@@ -20,7 +20,7 @@ client.on('message', message => {
     if (message.author.bot) return;
     // console.log(message.content);
     const args = message.content.slice(prefix.length).trim().split(/ +/);
-    const command = args.shift().toLowerCase();
+    const commandName = args.shift().toLowerCase();
     if (message.content === `Afterglow${prefix}`) {
         message.channel.send('えいえいお〜〜');
     } else if (message.content.startsWith('afterglow')) {
@@ -30,10 +30,23 @@ client.on('message', message => {
     } else if (message.content === 'user_info') {
         message.channel.send(`Your username is : ${message.author.username}\nYour ID is :${message.author.id}`);
     }
-    if (!client.commands.has(command)) return;
+
+    // コマンドファイル用の記述
+    if (!client.commands.has(commandName)) return;
+
+    const command = client.commands.get(commandName);
+
+    if (!command.args || !args.length) {
+        let reply = `You didn't provide any argument, ${message.author}!`;
+
+        if (command.usage) {
+            reply += `\nUsage: \`${prefix}${command.name} ${command.usage}\``;
+        }
+        return message.channel.send(reply);
+    }
 
     try {
-        client.commands.get(command).execute(message, args);
+        command.execute(message, args);
     } catch (error) {
         console.error(error);
         message.reply('there was an error trying to execute that command');

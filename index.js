@@ -47,7 +47,7 @@ client.on('message', async message => {
     } else if (command === 'bye') {
         if (message.member.voice.channel) {
             message.member.voice.channel.leave();
-            message.channel.send('See you !')
+            message.channel.send('See you !');
             console.log('Bot left Voice chat !');
         } else {
             message.reply('You are not in voice channel');
@@ -82,6 +82,7 @@ client.on('message', async message => {
 client.login(token);
 
 function museBot(message, connection, url) {
+    // issues #9
     const dispatcher = connection.play(ytdl(url));
 
     dispatcher.pause([true]);

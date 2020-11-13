@@ -34,7 +34,7 @@ client.on('message', async message => {
     } else if (command === 'play') {
         if (message.member.voice.channel) {
             const connection = await message.member.voice.channel.join();
-            museBot(connection, args[0]);
+            museBot(message, connection, args[0]);
         } else {
             message.reply('You need to join a voice channel first!');
         }
@@ -54,13 +54,13 @@ client.on('message', async message => {
 
 client.login(token);
 
-async function museBot(connection, url) {
-    const dispatcher = connection.play(await ytdl(url));
+function museBot(message, connection, url) {
+    const dispatcher = connection.play(ytdl(url));
 
-    dispatcher.setVolume(1.0);
+    dispatcher.setVolume(0.1);
 
     dispatcher.on('finish', () => {
         console.log('Finished playing!');
-        // dispatcher.destroy();
+        message.member.voice.channel.leave();
     });
 }

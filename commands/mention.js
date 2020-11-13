@@ -1,7 +1,7 @@
 module.exports = {
     name: 'mention',
     description: 'Mention!',
-    args: true,
+    args: false,
     usage: '<username>',
     execute(message, args) {
         if (!message.mentions.users.size) {

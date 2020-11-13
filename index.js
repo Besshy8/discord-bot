@@ -37,7 +37,7 @@ client.on('message', message => {
     const command = client.commands.get(commandName);
 
     if (!command.args || !args.length) {
-        let reply = `You didn't provide any argument, ${message.author}!`;
+        let reply = 'No argumentation';
 
         if (command.usage) {
             reply += `\nUsage: \`${prefix}${command.name} ${command.usage}\``;

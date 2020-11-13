@@ -34,7 +34,9 @@ client.on('message', async message => {
     } else if (command === 'play') {
         if (message.member.voice.channel) {
             const connection = await message.member.voice.channel.join();
+            // const dispatcher = connection.play(ytdl(url));
             museBot(message, connection, args[0]);
+            // console.log(2); // museBotが実行前に実行される。
         } else {
             message.reply('You need to join a voice channel first!');
         }
@@ -57,10 +59,32 @@ client.login(token);
 function museBot(message, connection, url) {
     const dispatcher = connection.play(ytdl(url));
 
+    dispatcher.pause([true]);
+    sleep(1000);
+    dispatcher.resume();
+    // console.log(dispatcher.pausedTime);
+
     dispatcher.setVolume(0.1);
+
+    // 'start'のイベントのdocが見つからない。
+    dispatcher.on('start', () => {
+        console.log('start playing!');
+    });
 
     dispatcher.on('finish', () => {
         console.log('Finished playing!');
         message.member.voice.channel.leave();
     });
+}
+
+// setIntervalでうまくいかない。以下のサイト参照。
+// https://qiita.com/albno273/items/c2d48fdcbf3a9a3434db
+function sleep(time) {
+    const d1 = new Date();
+    while (true) {
+        const d2 = new Date();
+        if (d2 - d1 > time) {
+            return;
+        }
+    }
 }

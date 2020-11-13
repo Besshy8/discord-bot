@@ -47,6 +47,7 @@ client.on('message', async message => {
     } else if (command === 'bye') {
         if (message.member.voice.channel) {
             message.member.voice.channel.leave();
+            message.channel.send('See you !')
             console.log('Bot left Voice chat !');
         } else {
             message.reply('You are not in voice channel');

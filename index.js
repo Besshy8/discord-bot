@@ -22,6 +22,8 @@ client.on('message', async message => {
     // console.log(message.content);
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
+    // const urlMap = new Discord.Collection();
+    // urlMap.set('Url', args[0]);
 
     if (message.content === `Afterglow${prefix}`) {
         message.channel.send('えいえいお〜〜');
@@ -36,11 +38,33 @@ client.on('message', async message => {
             const connection = await message.member.voice.channel.join();
             // const dispatcher = connection.play(ytdl(url));
             museBot(message, connection, args[0]);
+            const url = args[0];
+            fs.writeFileSync('tmp.txt', url);
+            // console.log(2); // museBotが実行前に実行される。
+        } else {
+            message.reply('You need to join a voice channel first!');
+        }
+    } else if (command === 'bye') {
+        if (message.member.voice.channel) {
+            message.member.voice.channel.leave();
+            console.log('Bot left Voice chat !');
+        } else {
+            message.reply('You are not in voice channel');
+        }
+    } else if (command === 'stop') {
+        if (message.member.voice.channel) {
+            const connection = await message.member.voice.channel.join();
+            // const dispatcher = connection.play(ytdl(url));
+            const urlMapVal = fs.readFileSync('tmp.txt');
+            const urlMap = new Discord.Collection();
+            urlMap.set('Url', urlMapVal);
+            pauseMusic(connection, `${urlMap.get('Url')}`);
             // console.log(2); // museBotが実行前に実行される。
         } else {
             message.reply('You need to join a voice channel first!');
         }
     }
+
     if (!client.commands.has(command)) return;
 
     try {
@@ -62,7 +86,7 @@ function museBot(message, connection, url) {
     dispatcher.pause([true]);
     sleep(1000);
     dispatcher.resume();
-    // console.log(dispatcher.pausedTime);
+    console.log(`Waiting... ${dispatcher.pausedTime - 1} ms`);
 
     dispatcher.setVolume(0.1);
 
@@ -75,6 +99,12 @@ function museBot(message, connection, url) {
         console.log('Finished playing!');
         message.member.voice.channel.leave();
     });
+}
+
+function pauseMusic(connection, url) {
+    const dispatcher = connection.play(ytdl(url));
+    dispatcher.pause();
+    // pauseが5min続いたらleaveする。
 }
 
 // setIntervalでうまくいかない。以下のサイト参照。

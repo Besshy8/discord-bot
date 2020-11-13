@@ -22,6 +22,7 @@ client.on('message', async message => {
     // console.log(message.content);
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
+
     if (message.content === `Afterglow${prefix}`) {
         message.channel.send('えいえいお〜〜');
     } else if (message.content.startsWith('afterglow')) {
@@ -30,10 +31,10 @@ client.on('message', async message => {
         message.channel.send(`The server name is : ${message.guild.name}\nTotal members: ${message.guild.memberCount}`);
     } else if (message.content === 'user_info') {
         message.channel.send(`Your username is : ${message.author.username}\nYour ID is :${message.author.id}`);
-    }else if (message.content === 'join') {
+    } else if (command === 'play') {
         if (message.member.voice.channel) {
             const connection = await message.member.voice.channel.join();
-            connection.play(ytdl('https://www.youtube.com/watch?v=ZlAU_w7-Xp8'));
+            museBot(connection, args[0]);
         } else {
             message.reply('You need to join a voice channel first!');
         }
@@ -53,6 +54,13 @@ client.on('message', async message => {
 
 client.login(token);
 
-async function play(connection, url) {
-    connection.play(await ytdl(url), { type: 'opus' });
+async function museBot(connection, url) {
+    const dispatcher = connection.play(await ytdl(url));
+
+    dispatcher.setVolume(1.0);
+
+    dispatcher.on('finish', () => {
+        console.log('Finished playing!');
+        // dispatcher.destroy();
+    });
 }

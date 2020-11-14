@@ -73,8 +73,8 @@ client.on('message', async message => {
             // チャンネル内メンション機能。
             message.channel.send('以下の日時に予定が開催されます。');
             message.channel.send(`\`イベント : ${args[0]}\n${date[0]}年${date[1]}月${date[2]}日 ${date[3]} 作成者: ${message.author.username}\``);
-            console.log(date);
-            fs.writeFileSync('tmp_reminder.txt', args[2]);
+            const db = args[0] + ' : ' + args[2];
+            fs.writeFileSync('tmp_reminder.txt', db);
             setTimeout(function() {
                 resolve('Successed!');
             }, 20000);
@@ -83,9 +83,10 @@ client.on('message', async message => {
         myFirstPromise.then((successMessage) => {
             // successMessage is whatever we passed in the resolve(...) function above.
             // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
-            const reminder = fs.readFileSync('tmp_reminder.txt');
-            console.log(reminder);
-            message.reply(`${reminder.toString('utf8')}になりました。`);
+            const buf = fs.readFileSync('tmp_reminder.txt');
+            const reminder = buf.toString('utf-8').split(' : ');
+            message.reply('あと1分で以下のイベントが開催されます。');
+            message.channel.send(`\`イベント : ${reminder[0]}\n 開催日時: ${reminder[1]}\``);
             console.log('Reminder' + successMessage);
         });
     }

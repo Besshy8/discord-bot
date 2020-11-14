@@ -65,11 +65,29 @@ client.on('message', async message => {
             message.reply('You need to join a voice channel first!');
         }
     } else if (command === 'reminder') {
-        const date = args[2].split('-');
-        // チャンネル内メンション機能。
-        message.channel.send('以下の日時に予定が開催されます。');
-        message.channel.send(`\`イベント : ${args[0]}\n${date[0]}年${date[1]}月${date[2]}日 ${date[3]} 作成者: ${message.author.username}\``);
-        console.log(date);
+        const myFirstPromise = new Promise((resolve, reject) => {
+            // We call resolve(...) when what we were doing asynchronously was successful, and reject(...) when it failed.
+            // In this example, we use setTimeout(...) to simulate async code.
+            // In reality, you will probably be using something like XHR or an HTML5 API.
+            const date = args[2].split('-');
+            // チャンネル内メンション機能。
+            message.channel.send('以下の日時に予定が開催されます。');
+            message.channel.send(`\`イベント : ${args[0]}\n${date[0]}年${date[1]}月${date[2]}日 ${date[3]} 作成者: ${message.author.username}\``);
+            console.log(date);
+            fs.writeFileSync('tmp_reminder.txt', args[2]);
+            setTimeout(function() {
+                resolve('Successed!');
+            }, 20000);
+        });
+
+        myFirstPromise.then((successMessage) => {
+            // successMessage is whatever we passed in the resolve(...) function above.
+            // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
+            const reminder = fs.readFileSync('tmp_reminder.txt');
+            console.log(reminder);
+            message.reply(`${reminder.toString('utf8')}になりました。`);
+            console.log('Reminder' + successMessage);
+        });
     }
 
     if (!client.commands.has(command)) return;

@@ -1,6 +1,7 @@
 module.exports = {
     name: 'prune',
     description: 'Prune',
+    args: false,
     execute(message, args) {
         const amount = parseInt(args[0]);
         // BOTのパーミッション周りでエラーがはかれたので調査

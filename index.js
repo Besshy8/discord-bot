@@ -21,9 +21,8 @@ client.on('message', async message => {
     if (message.author.bot) return;
     // console.log(message.content);
     const args = message.content.slice(prefix.length).trim().split(/ +/);
-    const command = args.shift().toLowerCase();
-    // const urlMap = new Discord.Collection();
-    // urlMap.set('Url', args[0]);
+
+    const commandName = args.shift().toLowerCase();
 
     if (message.content === `Afterglow${prefix}`) {
         message.channel.send('えいえいお〜〜');
@@ -124,10 +123,22 @@ client.on('message', async message => {
         });
     }
 
-    if (!client.commands.has(command)) return;
+    // コマンドファイル用の記述
+    if (!client.commands.has(commandName)) return;
+
+    const command = client.commands.get(commandName);
+
+    if (!command.args || !args.length) {
+        let reply = 'No argumentation';
+
+        if (command.usage) {
+            reply += `\nUsage: \`${prefix}${command.name} ${command.usage}\``;
+        }
+        return message.channel.send(reply);
+    }
 
     try {
-        client.commands.get(command).execute(message, args);
+        command.execute(message, args);
     } catch (error) {
         console.error(error);
         message.reply('there was an error trying to execute that command');

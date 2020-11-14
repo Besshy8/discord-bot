@@ -64,6 +64,8 @@ client.on('message', async message => {
         } else {
             message.reply('You need to join a voice channel first!');
         }
+    } else if (command === 'reminder') {
+        console.log(args);
     }
 
     if (!client.commands.has(command)) return;

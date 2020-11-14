@@ -65,7 +65,11 @@ client.on('message', async message => {
             message.reply('You need to join a voice channel first!');
         }
     } else if (command === 'reminder') {
-        console.log(args);
+        const date = args[2].split('-');
+        // チャンネル内メンション機能。
+        message.channel.send('以下の日時に予定が開催されます。');
+        message.channel.send(`\`イベント : ${args[0]}\n${date[0]}年${date[1]}月${date[2]}日 ${date[3]} 作成者: ${message.author.username}\``);
+        console.log(date);
     }
 
     if (!client.commands.has(command)) return;

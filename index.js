@@ -65,7 +65,7 @@ client.on('message', async message => {
             message.reply('You need to join a voice channel first!');
         }
     } else if (command === 'reminder') {
-        const myFirstPromise = new Promise((resolve, reject) => {
+        const firstMention = new Promise((resolve, reject) => {
             // We call resolve(...) when what we were doing asynchronously was successful, and reject(...) when it failed.
             // In this example, we use setTimeout(...) to simulate async code.
             // In reality, you will probably be using something like XHR or an HTML5 API.
@@ -77,8 +77,8 @@ client.on('message', async message => {
             const remindTime = 5;
             const now = new Date();
             const start_min = date[3].split(':')[1];
-            console.log(now.getMinutes());
-            console.log(start_min);
+            console.log(now.getMinutes() + 'min');
+            console.log(start_min + 'min');
             const pauseTime = (start_min - now.getMinutes()) - remindTime;
 
             const db = args[0] + ' : ' + args[2];
@@ -89,14 +89,38 @@ client.on('message', async message => {
             }, pauseTime * 60000);
         });
 
-        myFirstPromise.then((successMessage) => {
+        firstMention.then((successMessage) => {
             // successMessage is whatever we passed in the resolve(...) function above.
             // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
             const buf = fs.readFileSync('tmp_reminder.txt');
             const reminder = buf.toString('utf-8').split(' : ');
             message.reply('あと5分で以下のイベントが開催されます。');
             message.channel.send(`\`イベント : ${reminder[0]}\n 開催日時: ${reminder[1]}\``);
-            console.log('Reminder' + successMessage);
+            console.log('Reminder before 5 min' + successMessage);
+            const secondMention = new Promise((resolve, reject) => {
+                setTimeout(function() {
+                    resolve('Succeed');
+                }, 4 * 60000);
+            });
+            return secondMention;
+        }).then((successMessage) => {
+            const buf = fs.readFileSync('tmp_reminder.txt');
+            const reminder = buf.toString('utf-8').split(' : ');
+            message.reply('あと1分で以下のイベントが開催されます。');
+            message.channel.send(`\`イベント : ${reminder[0]}\n 開催日時: ${reminder[1]}\``);
+            console.log('Reminder before 1 min' + successMessage);
+            const lastMention = new Promise((resolve, reject) => {
+                setTimeout(function() {
+                    resolve('Succeed');
+                }, 60000);
+            });
+            return lastMention;
+        }).then((successMessage) => {
+            const buf = fs.readFileSync('tmp_reminder.txt');
+            const reminder = buf.toString('utf-8').split(' : ');
+            message.reply('以下のイベントが始まりました。');
+            message.channel.send(`\`イベント : ${reminder[0]}\n 開催日時: ${reminder[1]}\``);
+            console.log('Reminder last' + successMessage);
         });
     }
 
